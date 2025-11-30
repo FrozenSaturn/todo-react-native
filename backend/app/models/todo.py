@@ -9,5 +9,8 @@ class Todo(Base):
     title = Column(String, index=True)
     completed = Column(Boolean, default=False)
     user_id = Column(Integer, ForeignKey("users.id"))
+    folder_id = Column(Integer, ForeignKey("folders.id"), nullable=True)
 
     owner = relationship("User", back_populates="todos")
+    folder = relationship("Folder", back_populates="todos")
+    subtasks = relationship("SubTask", back_populates="todo", cascade="all, delete-orphan")

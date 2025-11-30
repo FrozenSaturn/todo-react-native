@@ -12,3 +12,4 @@ class User(Base):
     is_active = Column(Boolean, default=True)
 
     todos = relationship("Todo", back_populates="owner")
+    folders = relationship("Folder", back_populates="owner")

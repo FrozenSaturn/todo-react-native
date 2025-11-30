@@ -13,11 +13,14 @@ interface UserProfile {
     is_active: boolean;
 }
 
+import { useRouter } from 'expo-router';
+
 export default function ProfileScreen() {
     const { logout } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
     const isDark = theme === 'dark';
     const bgColor = isDark ? '#000' : '#F2F2F7';
@@ -50,7 +53,7 @@ export default function ProfileScreen() {
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => { }} style={styles.backButton}>
+                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                     <Ionicons name="arrow-back" size={24} color={headerColor} />
                 </TouchableOpacity>
                 <Text style={[styles.headerTitle, { color: headerColor }]}>Settings</Text>

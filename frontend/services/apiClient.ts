@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-const API_URL = 'http://192.168.0.103:8000'; // Updated to local IP for device access
+const API_URL = 'http://192.168.0.104:8000'; // Updated to local IP for device access
 
 const apiClient = axios.create({
     baseURL: API_URL,
