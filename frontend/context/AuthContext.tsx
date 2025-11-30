@@ -22,7 +22,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             try {
                 const token = await SecureStore.getItemAsync('userToken');
                 if (token) {
-                    setUserToken(token);
+                    // Validate token
+                    try {
+                        await apiClient.get('/auth/me', {
+                            headers: { Authorization: `Bearer ${token}` }
+                        });
+                        setUserToken(token);
+                    } catch (err) {
+                        console.log('Token validation failed, clearing token');
+                        await SecureStore.deleteItemAsync('userToken');
+                        setUserToken(null);
+                    }
                 }
             } catch (e) {
                 console.error('Failed to load token', e);
@@ -38,7 +48,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
             const response = await apiClient.post('/auth/login', { email, password });
             const token = response.data.access_token;
+            console.log('Login successful, received token:', token);
             await SecureStore.setItemAsync('userToken', token);
+            console.log('Token saved to SecureStore');
             setUserToken(token);
             router.replace('/');
         } catch (error) {

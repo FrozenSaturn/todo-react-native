@@ -24,7 +24,10 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
         if email is None:
             raise credentials_exception
         token_data = TokenData(email=email)
-    except JWTError:
+    except JWTError as e:
+        print(f"JWT Error: {e}")
+        print(f"Token: {token}")
+        print(f"Secret Key used: {settings.SECRET_KEY[:5]}...")
         raise credentials_exception
     user = user_crud.get_user_by_email(db, email=token_data.email)
     if user is None:

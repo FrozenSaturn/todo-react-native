@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-const API_URL = 'http://192.168.0.106:8000'; // Updated to local IP for device access
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://192.168.0.106:8000';
 
 const apiClient = axios.create({
     baseURL: API_URL,
@@ -14,12 +14,9 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
     async (config) => {
         const token = await SecureStore.getItemAsync('userToken');
-        console.log('Token from SecureStore:', token);
+        // console.log('Token from SecureStore:', token);
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
-            console.log('Authorization Header:', config.headers.Authorization);
-        } else {
-            console.log('No token found in SecureStore');
         }
         return config;
     },
@@ -33,13 +30,10 @@ apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
         if (error.response && error.response.status === 401) {
-            console.log('Received 401, clearing token and redirecting to login');
-            await SecureStore.deleteItemAsync('userToken');
-            // We can't easily access AuthContext's logout here, but we can force a navigation
-            // Ideally, AuthContext should listen to this, but for now:
-            // You might need to reload the app or use a global event emitter.
-            // For simplicity, let's just let the error propagate, but the user will be logged out on next app load/check.
-            // Or better, import router
+            console.log('Received 401 from API');
+            // Let AuthContext handle the logout logic via state check or event
+            // We won't delete the token here to avoid race conditions
+            // But we can redirect to ensure the user is moved away
             const { router } = require('expo-router');
             router.replace('/auth/login');
         }
